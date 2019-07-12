@@ -13,7 +13,7 @@ var (
 	// run redis-server on docker
 	// d run -d --name redis -h redis -p 6379:6379 redis:5.0.5
 	redisServerAddr = "10.19.138.22:6379"
-	counties = []string{"Norway", "Australia", "Switzerland", "Denmark", "Netherlands", "Germany", "Ireland",
+	counties        = []string{"Norway", "Australia", "Switzerland", "Denmark", "Netherlands", "Germany", "Ireland",
 		"United States", "Canada", "New Zealand", "Singapore", "Hong Kong", "Liechtenstein", "Sweden", "United Kingdom",
 		"Iceland", "Korea, South", "Israel", "Luxembourg", "Japan", "Belgium", "France", "Austria", "Finland",
 		"Slovenia", "Spain", "Italy", "Czech Republic", "Greece", "Estonia", "Brunei", "Cyprus", "Qatar", "Andorra",
@@ -25,21 +25,23 @@ var (
 		"Grenada", "Jordan", "Macedonia", "Ukraine", "Algeria", "Peru", "Albania", "Armenia", "Bosnia and Herzegovina",
 		"Ecuador", "Saint Lucia", "China", "Fiji", "Mongolia", "Thailand", "Dominica", "Libya", "Tunisia", "Colombia",
 		"Saint Vincent and the Grenadines", "Jamaica", "Tonga", "Belize", "Dominican Republic", "Suriname", "World",
-		"Maldives", "Samoa", }
+		"Maldives", "Samoa"}
 	hdis = []float64{0.944, 0.935, 0.93, 0.923, 0.922, 0.916, 0.916, 0.915, 0.913, 0.913, 0.912, 0.91, 0.908, 0.907,
 		0.907, 0.899, 0.898, 0.894, 0.892, 0.891, 0.89, 0.888, 0.885, 0.883, 0.88, 0.876, 0.873, 0.87, 0.865, 0.861,
 		0.856, 0.85, 0.85, 0.845, 0.844, 0.843, 0.839, 0.839, 0.837, 0.836, 0.835, 0.832, 0.83, 0.828, 0.824, 0.819,
 		0.818, 0.816, 0.802, 0.798, 0.798, 0.793, 0.793, 0.793, 0.79, 0.788, 0.785, 0.783, 0.782, 0.78, 0.78, 0.779,
 		0.777, 0.772, 0.772, 0.771, 0.769, 0.769, 0.766, 0.766, 0.762, 0.761, 0.757, 0.756, 0.755, 0.754, 0.752, 0.751,
 		0.75, 0.748, 0.747, 0.747, 0.736, 0.734, 0.733, 0.733, 0.733, 0.732, 0.729, 0.727, 0.727, 0.727, 0.726, 0.724,
-		0.724, 0.721, 0.72, 0.72, 0.719, 0.717, 0.715, 0.715, 0.714, 0.711, 0.706, 0.702, }
+		0.724, 0.721, 0.72, 0.72, 0.719, 0.717, 0.715, 0.715, 0.714, 0.711, 0.706, 0.702}
 )
 
 func main() {
-	testString()
-	testList()
-	testSet()
-	testZset()
+	//testString()
+	//testList()
+	//testSet()
+	//testZset()
+	//testHmap()
+	//testHyperLogLog()
 }
 
 func toClose(closer io.Closer) {
@@ -51,12 +53,12 @@ func toClose(closer io.Closer) {
 
 func getRedisClient() *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr: redisServerAddr,
-		DB: 0,
-		MaxRetries: 0,
-		DialTimeout: 5*time.Second,
-		ReadTimeout: 5*time.Second,
-		WriteTimeout: 5*time.Second,
+		Addr:         redisServerAddr,
+		DB:           0,
+		MaxRetries:   0,
+		DialTimeout:  5 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 		//TLSConfig *tls.Config
 	})
 }
@@ -101,13 +103,13 @@ func testString() {
 		} else {
 			fmt.Println("bytes:", hex.EncodeToString(byter))
 		}
-		f64, err := strCmd.Float64()      // parse string to float64
+		f64, err := strCmd.Float64() // parse string to float64
 		if err != nil {
 			fmt.Println("f64:", err)
 		} else {
 			fmt.Println("f64:", f64)
 		}
-		i64, err := strCmd.Int64()        // return int value of type is integer
+		i64, err := strCmd.Int64() // return int value of type is integer
 		if err != nil {
 			fmt.Println("i64:", err)
 		} else {
@@ -119,50 +121,50 @@ func testString() {
 	// append command: append content to value
 	intCmd := client.Append("lgq", "李哥")
 	afterlen, err := intCmd.Result()
-	fmt.Println(afterlen, err)   // return value len after append
+	fmt.Println(afterlen, err) // return value len after append
 
 	// setnx command: set value only when key not exists
 	boolCmd := client.SetNX("lgq", "李哥", 0)
 	hasset, err := boolCmd.Result()
-	fmt.Println(hasset, err)     // return if preform set
+	fmt.Println(hasset, err) // return if preform set
 
 	// `SET key value [expiration] XX`, set value only when key exists
 	boolCmd = client.SetXX("lgq", "李哥", 0)
 	hasset, err = boolCmd.Result()
-	fmt.Println(hasset, err)     // return if preform set
+	fmt.Println(hasset, err) // return if preform set
 
 	// exists command: check if key exists
 	intCmd = client.Exists("lgq", "杜兰特", "durant")
 	has, err := intCmd.Result()
-	fmt.Println(has, err)        // one key exists, return 1; none key exists, return 0
+	fmt.Println(has, err) // one key exists, return 1; none key exists, return 0
 	fmt.Println()
 
 	// keys command: find keys
 	strSliceCmd := client.Keys("i*")
 	strs, err := strSliceCmd.Result()
-	fmt.Println(strs, err)                // return all keys follow the queried pattern
+	fmt.Println(strs, err) // return all keys follow the queried pattern
 	fmt.Println()
 
 	// type command: get value type
 	for i := range kvs {
 		key := kvs[i][0].(string)
-		statusCmd := client.Type(key)  // all type is string
+		statusCmd := client.Type(key) // all type is string
 		re, err := statusCmd.Result()
 		fmt.Println(key, re, err)
 		strCmd := client.ObjectEncoding(key)
 		str, err := strCmd.Result()
 		fmt.Println(key, str, err)
 		/*
-		| key       |  value                      | encoding  | 
-		+-----------|-----------------------------+-----------|
-		| "lgq"     | "programmer"                | embstr    |
-		| "杜兰特"   | "篮球运动员"                  | embstr    |
-		| "floater" | 1.23e45                     | raw       |
-		| "inter"   | int32(1193046)              | int       |
-		| "int64er" | int64(0xabcdef098765432)    | int       |
-		| "uint64er"| uint64(0xabcdef0987654321)  | embstr    |
-		| "runer"   | 'Ⅲ',                        | int      |
-		| "byter"   | []byte("⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞")  | raw       |      */
+			| key       |  value                      | encoding  |
+			+-----------|-----------------------------+-----------|
+			| "lgq"     | "programmer"                | embstr    |
+			| "杜兰特"   | "篮球运动员"                  | embstr    |
+			| "floater" | 1.23e45                     | raw       |
+			| "inter"   | int32(1193046)              | int       |
+			| "int64er" | int64(0xabcdef098765432)    | int       |
+			| "uint64er"| uint64(0xabcdef0987654321)  | embstr    |
+			| "runer"   | 'Ⅲ',                        | int      |
+			| "byter"   | []byte("⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞")  | raw       |      */
 	}
 	fmt.Println()
 
@@ -171,7 +173,7 @@ func testString() {
 	re, err := statusCmd.Result()
 	fmt.Println(re, err)
 	sliceCmd := client.MGet("lgq", "runer", "aa", "byter")
-	values, err := sliceCmd.Result()    // return all values for keys, nil for non-existed key
+	values, err := sliceCmd.Result() // return all values for keys, nil for non-existed key
 	fmt.Println("err:", err, len(values))
 	for i := range values {
 		if values[i] != nil {
@@ -185,7 +187,7 @@ func testString() {
 		key := kvs[i][0].(string)
 		intCmd := client.Incr(key)
 		re, err := intCmd.Result()
-		fmt.Println(key, re, err)   // return error if value is not integer, return incremented value
+		fmt.Println(key, re, err) // return error if value is not integer, return incremented value
 	}
 }
 
@@ -195,23 +197,23 @@ func testList() {
 
 	// lpush command: push to list head, if list not exists, create first
 	list := "lister"
-	intCmd := client.LPush(list, "lgq", "墨西哥",)
+	intCmd := client.LPush(list, "lgq", "墨西哥")
 	re, err := intCmd.Result()
-	fmt.Println(re, err)        // return list length after push
+	fmt.Println(re, err) // return list length after push
 
 	// rpush command: push to list tail
 	intCmd = client.RPush(list, 'Ⅲ', []byte("⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞"))
 	re, err = intCmd.Result()
-	fmt.Println(re, err)        // return list length after add
+	fmt.Println(re, err) // return list length after add
 
 	// lset command: set list item based on index
 	statusCmd := client.LSet(list, 1, "秘鲁")
 	status, err := statusCmd.Result()
-	fmt.Println(status, err)    // return if lset ok
+	fmt.Println(status, err) // return if lset ok
 	fmt.Println()
 
 	// lindex command: get list item based on index
-	for i:=int64(0); i<4; i++ {
+	for i := int64(0); i < 4; i++ {
 		strCmd := client.LIndex(list, i)
 		str, err := strCmd.Result()
 		fmt.Println(i, str, err)
@@ -230,25 +232,25 @@ func testList() {
 	// count = 0 : remove all items equal to value
 	intCmd = client.LRem(list, 0, int('Ⅲ'))
 	re, err = intCmd.Result()
-	fmt.Println(re, err)        // return how many items are removed
+	fmt.Println(re, err) // return how many items are removed
 	fmt.Println()
 
 	// lpop command: pop list head
 	strCmd := client.LPop(list)
 	str, err := strCmd.Result()
-	fmt.Println(str, err)        // return popped value
+	fmt.Println(str, err) // return popped value
 	fmt.Println()
 
 	// llen command: return list length
 	intCmd = client.LLen(list)
 	llen, err := intCmd.Result()
-	fmt.Println(llen, err)        // return list length
+	fmt.Println(llen, err) // return list length
 	fmt.Println()
 
 	// del command: delete key
 	intCmd = client.Del(list)
 	re, err = intCmd.Result()
-	fmt.Println(re, err)        // return deleted key number
+	fmt.Println(re, err) // return deleted key number
 }
 
 func testSet() {
@@ -259,41 +261,41 @@ func testSet() {
 	cities := "cities"
 	intCmd := client.SAdd(cities, "los angeles", "são paulo", "quito", "ក្រុងសៀមរាប", "Нур-Султан", "თბილისი")
 	re, err := intCmd.Result()
-	fmt.Println(re, err)        // return the successfully added number
+	fmt.Println(re, err) // return the successfully added number
 
 	// sismember command: check if an element is in set
 	boolCmd := client.SIsMember(cities, []byte("ក្រុងសៀមរាប"))
 	in, err := boolCmd.Result()
-	fmt.Println(in, err)        // return true if in set else false
+	fmt.Println(in, err) // return true if in set else false
 
 	// srandmember key [count]: return random members of given count
 	strSliceCmd := client.SRandMemberN(cities, 2)
 	strs, err := strSliceCmd.Result()
-	fmt.Println("rand member:", strs, err)      // return members in string slice
+	fmt.Println("rand member:", strs, err) // return members in string slice
 
 	// spop key [count]: return random members of given count and remove them from set
 	strSliceCmd = client.SPopN(cities, 2)
 	strs, err = strSliceCmd.Result()
-	fmt.Println("rand pop:", strs, err)         // return members in string slice
+	fmt.Println("rand pop:", strs, err) // return members in string slice
 
 	// srem command: remove elements from set
 	intCmd = client.SRem(cities, "Нур-Султан", "თბილისი")
 	re, err = intCmd.Result()
-	fmt.Println("deleted number:", re, err)     // return successfully deleted number
+	fmt.Println("deleted number:", re, err) // return successfully deleted number
 
 	// scard command: return set cardinality (elements number)
 	intCmd = client.SCard(cities)
 	re, err = intCmd.Result()
-	fmt.Println("set cardinality:", re, err)    // return set elements number
+	fmt.Println("set cardinality:", re, err) // return set elements number
 
 	// smembers command: return all elements of a set
 	strSliceCmd = client.SMembers(cities)
 	strs, err = strSliceCmd.Result()
-	fmt.Println("all members:", strs, err)      // return members in string slice
+	fmt.Println("all members:", strs, err) // return members in string slice
 	fmt.Println()
 
 	rander := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for i:=0; i<500; i++ {
+	for i := 0; i < 500; i++ {
 		client.SAdd("seta", rander.Intn(1000))
 		client.SAdd("setb", rander.Intn(1000))
 	}
@@ -307,23 +309,23 @@ func testSet() {
 	// sinter command: get intersection of sets
 	strSliceCmd = client.SInter("seta", "setb")
 	strs, err = strSliceCmd.Result()
-	fmt.Println("intersect:", strs, err)       // return intersection set members
+	fmt.Println("intersect:", strs, err) // return intersection set members
 
 	// sdiff command: get difference of set, A-B = A-(A∩B)
 	strSliceCmd = client.SDiff("seta", "setb")
 	strs, err = strSliceCmd.Result()
-	fmt.Println("diff:", strs, err)            // return difference set members
+	fmt.Println("diff:", strs, err) // return difference set members
 
 	// sunionstore command: get union of sets, and store the results
 	intCmd = client.SUnionStore("union", "seta", "setb")
 	re, err = intCmd.Result()
-	fmt.Println("union size:", re, err)        // return union set size
+	fmt.Println("union size:", re, err) // return union set size
 
 	// sscan command: iterate set elements in multiple batches
 	scanCmd := client.SScan("union", 0, "", 0)
 	keys, cursor, err := scanCmd.Result()
 	fmt.Println("keys:", keys, "cursor:", cursor, "err:", err)
-	for cursor!=0 {
+	for cursor != 0 {
 		scanCmd = client.SScan("union", cursor, "", 0)
 		keys, cursor, err = scanCmd.Result()
 		fmt.Println("keys:", keys, "cursor:", cursor, "err:", err)
@@ -333,10 +335,10 @@ func testSet() {
 	// del command: delete key
 	intCmd = client.Del(cities, "seta", "setb")
 	re, err = intCmd.Result()
-	fmt.Println(re, err)       // return deleted key number
+	fmt.Println(re, err) // return deleted key number
 }
 
-func testZset()  {
+func testZset() {
 	client := getRedisClient()
 	defer toClose(client)
 	hdi := "hdi"
@@ -354,66 +356,66 @@ func testZset()  {
 	// zscore command: get zset element score
 	floatCmd := client.ZScore(hdi, "Lithuania")
 	f, err := floatCmd.Result()
-	fmt.Println("zscore:", f, err)    // return score of elements
+	fmt.Println("zscore:", f, err) // return score of elements
 
 	// zrank command: get zset element rank
 	intCmd := client.ZRank(hdi, "Lithuania")
 	i, err := intCmd.Result()
-	fmt.Println("zrank:", i, err)     // return rank of elements
+	fmt.Println("zrank:", i, err) // return rank of elements
 
 	// zincby command: increase score for an element
 	floatCmd = client.ZIncrBy(hdi, -0.1, "Lithuania")
 	f, err = floatCmd.Result()
-	fmt.Println("zincby:", f, err)    // return modified score
+	fmt.Println("zincby:", f, err) // return modified score
 
 	// zcard command: get zset cardinality
 	intCmd = client.ZCard(hdi)
 	i, err = intCmd.Result()
-	fmt.Println("zcard:", i, err)     // return cardinality of zset
+	fmt.Println("zcard:", i, err) // return cardinality of zset
 
 	// zcount command: count elements number within range of score
 	intCmd = client.ZCount(hdi, "0.75", "0.85")
 	i, err = intCmd.Result()
-	fmt.Println("zcount:", i, err)     // return count of elements within score range
+	fmt.Println("zcount:", i, err) // return count of elements within score range
 	fmt.Println()
 
 	// zpopmax, zpopmin command: pop given count elements with max or min scores
 	zSliceCmd := client.ZPopMax(hdi, 3)
 	zs, err := zSliceCmd.Result()
-	fmt.Println("zpopmax 3:", zs, err)   // return elements within range
+	fmt.Println("zpopmax 3:", zs, err) // return elements within range
 
 	// zrange command: get elements based on rank
 	strSliceCmd := client.ZRange(hdi, 0, 9)
 	strs, err := strSliceCmd.Result()
-	fmt.Println("zrange 0 9:", strs, err)   // return elements within range
+	fmt.Println("zrange 0 9:", strs, err) // return elements within range
 
 	// zrevrange command: get elements based on descent rank
 	zSliceCmd = client.ZRevRangeWithScores(hdi, 0, 9)
 	zs, err = zSliceCmd.Result()
-	fmt.Println("zrevrange 0 9 withscores:", zs, err)   // return elements within range
+	fmt.Println("zrevrange 0 9 withscores:", zs, err) // return elements within range
 
 	// zrangebyscore command: get elements based on score range
-	strSliceCmd = client.ZRangeByScore(hdi, redis.ZRangeBy{Min: "0.75", Max: "(0.85", Offset: 0, Count:10})
+	strSliceCmd = client.ZRangeByScore(hdi, redis.ZRangeBy{Min: "0.75", Max: "(0.85", Offset: 0, Count: 10})
 	strs, err = strSliceCmd.Result()
-	fmt.Println("zrangebyscore 0.75 (0.85 limit 0 10:", strs, err)   // return elements within range
+	fmt.Println("zrangebyscore 0.75 (0.85 limit 0 10:", strs, err) // return elements within range
 
 	// zrem command: remove elements from zset
 	fmt.Println("to remove", counties[perm[0]], counties[perm[1]])
 	intCmd = client.ZRem(hdi, counties[perm[0]], counties[perm[1]])
 	i, err = intCmd.Result()
-	fmt.Println("zrem:", i, err)     // return deleted elements count
+	fmt.Println("zrem:", i, err) // return deleted elements count
 
 	// zremrangebyscore command: remove elements from zset by score
 	intCmd = client.ZRemRangeByScore(hdi, "(0.75", "0.78")
 	i, err = intCmd.Result()
-	fmt.Println("zremrangebyscore (0.75 0.78:", i, err)     // return deleted elements count
+	fmt.Println("zremrangebyscore (0.75 0.78:", i, err) // return deleted elements count
 	fmt.Println()
 
 	// zscan command: iterate zset elements in multiple batches
 	scanCmd := client.ZScan(hdi, 0, "", 5)
 	keys, cursor, err := scanCmd.Result()
 	fmt.Println("keys:", keys, "cursor:", cursor, "err:", err)
-	for cursor!=0 {
+	for cursor != 0 {
 		scanCmd = client.SScan(hdi, cursor, "", 5)
 		keys, cursor, err = scanCmd.Result()
 		fmt.Println("keys:", keys, "cursor:", cursor, "err:", err)
@@ -423,5 +425,112 @@ func testZset()  {
 	// del command: delete key
 	intCmd = client.Del(hdi)
 	i, err = intCmd.Result()
-	fmt.Println(i, err)       // return deleted key number
+	fmt.Println(i, err) // return deleted key number
+}
+
+func testHmap() {
+	client := getRedisClient()
+	defer toClose(client)
+
+	// hset command: set hashmap field value
+	hdi := "hdim"
+	perm := rand.Perm(len(counties))
+	for i := range perm {
+		client.HSet(hdi, counties[perm[i]], hdis[perm[i]]) // return if a new field has been set
+	}
+
+	// hsetnx command: set hashmap field value only when field is absent
+	boolCmd := client.HSetNX(hdi, "Taiwan Province of China", 0.88)
+	b, err := boolCmd.Result()
+	fmt.Println("hsetnx:", b, err) // return if the field has been set
+
+	// hget command: get hashmap field value
+	strCmd := client.HGet(hdi, "Fiji")
+	str, err := strCmd.Result()
+	fmt.Println("hget:", str, err) // return field value
+
+	// hmset command: set multiple field values
+	mset := make(map[string]interface{})
+	mset["Taiwan Province of China"] = "中国台湾省"
+	mset["Ireland"] = "爱尔兰共和国"
+	statusCmd := client.HMSet(hdi, mset)
+	status, err := statusCmd.Result()
+	fmt.Println("hmset:", status, err) // return ok if operation success
+
+	// hmget command: get multiple field values
+	sliceCmd := client.HMGet(hdi, "China", "Ireland", "Taiwan")
+	faces, err := sliceCmd.Result()   // return []interface{} to contain nil value
+	fmt.Println("hmget:", faces, err) // return multiple field values
+
+	// hlen command: get hashmap size
+	intCmd := client.HLen(hdi)
+	i, err := intCmd.Result()
+	fmt.Println("hlen:", i, err) // return hashmaps size
+
+	// hdel command: delete field
+	intCmd = client.HDel(hdi, "Norway", "Finland", "Somalia")
+	i, err = intCmd.Result()
+	fmt.Println("hdel:", i, err) // return how many fields are deleted
+
+	// hgetall command: get all field and value pairs
+	strStrMapCmd := client.HGetAll(hdi)
+	mapper, err := strStrMapCmd.Result()
+	fmt.Println("hgetall:", mapper, err) // return all field and value pairs as go map
+
+	// hvals command: get all values
+	strSliceCmd := client.HVals(hdi)
+	strs, err := strSliceCmd.Result()
+	fmt.Println("hval:", strs, err) // return all values
+
+	// hscan command: iterate hashmap in multiple batches
+	scanCmd := client.HScan(hdi, 0, "", 10)
+	kvs, cursor, err := scanCmd.Result()
+	fmt.Println("cursor:", cursor, "err:", err, "kvs:", kvs)
+	for cursor != 0 {
+		scanCmd = client.HScan(hdi, cursor, "", 10)
+		kvs, cursor, err = scanCmd.Result()
+		fmt.Println("cursor:", cursor, "err:", err, "kvs:", kvs)
+	}
+
+	// del command: delete key
+	intCmd = client.Del(hdi)
+	i, err = intCmd.Result()
+	fmt.Println(i, err) // return deleted key number
+}
+
+func testHyperLogLog() {
+	// HyperLogLog is algorithm to estimate the cardinality (number of unique elements) of elements
+	client := getRedisClient()
+	defer toClose(client)
+
+	// pfadd command: add elements to set
+	intCmd := client.PFAdd("countries", "china", "united states", "france")
+	i, err := intCmd.Result()
+	fmt.Println("pfadd:", i, err) // return 1 if the inner state of hyperloglog is modified
+	intCmd = client.PFAdd("countries", "peru", "united states", "brazil")
+	i, err = intCmd.Result()
+	fmt.Println("pfadd:", i, err)
+	intCmd = client.PFAdd("territories", "hong kong sar, china", "taiwan, provinhce of china", "isle of mann")
+	i, err = intCmd.Result()
+	fmt.Println("pfadd:", i, err)
+
+	// pfcount command: return the estimated cardinality of set.
+	// if specify multiple sets, return the cardinality of the union of the sets.
+	intCmd = client.PFCount("countries", "territories")
+	i, err = intCmd.Result()
+	fmt.Println("pfcount:", i, err)
+
+	// pfmerge command: union multiple sets into a set.
+	statusCmd := client.PFMerge("places", "countries", "territories")
+	status, err := statusCmd.Result()
+	fmt.Println("pfmerge:", status, err)
+
+	intCmd = client.PFCount("places")
+	i, err = intCmd.Result()
+	fmt.Println("pfcount:", i, err)
+
+	// del command: delete key
+	intCmd = client.Del("places", "countries", "territories")
+	i, err = intCmd.Result()
+	fmt.Println(i, err) // return deleted key number
 }
